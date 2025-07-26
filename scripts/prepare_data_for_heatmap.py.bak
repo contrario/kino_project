@@ -1,0 +1,24 @@
+import pandas as pd
+import os
+
+print("🔄 Προετοιμασία δεδομένων για heatmap...")
+
+# 🔹 Διαδρομή αρχικού αρχείου
+input_path = os.path.join("..", "data", "kino_data.csv")
+output_path = os.path.join("..", "data", "kino_data_prepared.csv")
+
+# 🔹 Διαβάζουμε το αρχείο
+df = pd.read_csv(input_path)
+
+# 🔹 Μετονομασία στηλών num_1 → number_1
+num_cols = {f'num_{i}': f'number_{i}' for i in range(1, 21)}
+df.rename(columns=num_cols, inplace=True)
+
+# 🔹 Δημιουργία στήλης "hour" από το draw_time
+df['draw_time'] = pd.to_datetime(df['draw_time'])
+df['hour'] = df['draw_time'].dt.hour
+
+# 🔹 Αποθήκευση σε νέο αρχείο
+df.to_csv(output_path, index=False)
+
+print(f"✅ Το νέο αρχείο αποθηκεύτηκε ως: {output_path}")

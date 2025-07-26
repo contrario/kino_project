@@ -1,0 +1,52 @@
+import json
+from datetime import datetime
+import os
+
+# --- Ρυθμίσεις Δελτίου ---
+ticket_draws = 10         # Πόσες κληρώσεις θα παίξει
+ticket_cost_per_draw = 0.50
+ticket_numbers_count = 20
+
+# --- Paths ---
+data_path = "../data/rolling_window_top_numbers.json"
+output_dir = "../outputs"
+os.makedirs(output_dir, exist_ok=True)
+
+# --- Φόρτωσε Top Αριθμούς από JSON ---
+with open(data_path, "r") as f:
+    top_numbers = json.load(f)
+
+if not isinstance(top_numbers, list) or len(top_numbers) < ticket_numbers_count:
+    raise ValueError("❌ Μη έγκυρα δεδομένα top αριθμών για δημιουργία δελτίου.")
+
+# --- Επιλογή Αριθμών ---
+selected_numbers = top_numbers[:ticket_numbers_count]
+
+# --- Πληροφορίες Δελτίου ---
+total_cost = ticket_draws * ticket_cost_per_draw
+now = datetime.now()
+ticket_info = {
+    "ημερομηνία": now.strftime("%Y-%m-%d %H:%M"),
+    "αριθμοί": selected_numbers,
+    "κληρώσεις": ticket_draws,
+    "κόστος (€)": f"{total_cost:.2f}"
+}
+
+# --- Εκτύπωση ---
+print("\n🎯 Δελτίο για 10 Κληρώσεις:")
+print("Αριθμοί:", selected_numbers)
+print(f"📅 Ισχύει για τις επόμενες {ticket_draws} κληρώσεις")
+print(f"💰 Κόστος: {total_cost:.2f} €")
+
+# --- Αποθήκευση σε αρχείο ---
+filename = f"ticket_{now.strftime('%Y-%m-%d_%H-%M')}.txt"
+filepath = os.path.join(output_dir, filename)
+
+with open(filepath, "w", encoding="utf-8") as f:
+    f.write("🎯 Δελτίο ΚΙΝΟ (Top 20)\n")
+    f.write(f"Ημερομηνία: {ticket_info['ημερομηνία']}\n")
+    f.write(f"Αριθμοί: {', '.join(map(str, selected_numbers))}\n")
+    f.write(f"Κληρώσεις: {ticket_info['κληρώσεις']}\n")
+    f.write(f"Κόστος: {ticket_info['κόστος (€)']} €\n")
+
+print(f"\n✅ Αποθηκεύτηκε στο αρχείο: {filepath}")

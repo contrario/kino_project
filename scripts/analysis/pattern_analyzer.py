@@ -1,0 +1,23 @@
+import os
+from scripts.utils.logger import log_info
+
+def analyze_patterns(csv_path):
+    import pandas as pd
+    from collections import Counter
+
+    log_info("Ξεκίνησε η ανάλυση μοτίβων...")
+
+    df = pd.read_csv(csv_path)
+    all_numbers = []
+
+    for nums in df["numbers"]:
+        try:
+            numbers = [int(n.strip()) for n in str(nums).split(",")]
+            all_numbers.extend(numbers)
+        except:
+            continue
+
+    frequency = dict(Counter(all_numbers))
+
+    log_info("Ανάλυση μοτίβων ολοκληρώθηκε.")
+    return frequency

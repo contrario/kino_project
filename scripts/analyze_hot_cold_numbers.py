@@ -1,0 +1,61 @@
+import pandas as pd
+import os
+from collections import Counter
+from ast import literal_eval
+from time import time
+
+start = time()
+print("🔥 Ανάλυση Hot & Cold αριθμών σε εξέλιξη...")
+
+# --------------------------------------------------
+# 1. Φόρτωση δεδομένων
+# --------------------------------------------------
+csv_path = "data/kino_data.csv"
+df = pd.read_csv(csv_path)
+
+# --------------------------------------------------
+# 2. Εύρεση σωστής στήλης με τους αριθμούς
+# --------------------------------------------------
+possible_cols = ["winning_numbers", "winningNumbers", "numbers"]
+num_col = None
+for col in possible_cols:
+    if col in df.columns:
+        num_col = col
+        break
+
+if num_col is None:
+    print("❌ Δεν βρέθηκε στήλη με λίστα αριθμών KINO.")
+    print(f"📋 Στήλες στο αρχείο: {list(df.columns)}")
+    exit(1)
+
+print(f"✅ Χρησιμοποιείται η στήλη: '{num_col}'")
+
+# --------------------------------------------------
+# 3. Μετατροπή string → λίστα int
+# --------------------------------------------------
+df[num_col] = df[num_col].apply(literal_eval)
+
+# --------------------------------------------------
+# 4. Συλλογή & συχνότητα
+# --------------------------------------------------
+all_nums = [n for sub in df[num_col] for n in sub]
+counts = Counter(all_nums)
+freq_df = pd.DataFrame(sorted(counts.items()), columns=["Number", "Frequency"])
+
+# --------------------------------------------------
+# 5. Αποθήκευση αποτελεσμάτων
+# --------------------------------------------------
+os.makedirs("results", exist_ok=True)
+freq_df.to_csv("results/number_frequency.csv", index=False)
+
+top10 = freq_df.sort_values("Frequency", ascending=False).head(10)
+bot10 = freq_df.sort_values("Frequency", ascending=True).head(10)
+
+top10.to_csv("results/hot_numbers.csv", index=False)
+bot10.to_csv("results/cold_numbers.csv", index=False)
+
+print("✅ Ολοκληρώθηκε η ανάλυση Hot & Cold αριθμών!")
+print("🔥 Top-10 → results/hot_numbers.csv")
+print("❄️ Cold-10 → results/cold_numbers.csv")
+print("📊 Σύνολο  → results/number_frequency.csv")
+print(f"⏱️ Χρόνος εκτέλεσης: {round(time() - start, 2)} sec")

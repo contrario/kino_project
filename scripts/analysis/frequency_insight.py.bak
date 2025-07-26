@@ -1,0 +1,29 @@
+import sys
+import os
+
+# Προσθήκη root path για imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from fetchers.smart_fetch_kino_data import fetch_recent_draws
+from core.pattern_analyzer import analyze_draws
+from utils.logger import log_info
+
+def main():
+    log_info("📊 Εκκίνηση ανάλυσης συχνοτήτων για τις 100 τελευταίες κληρώσεις...")
+
+    draws = fetch_recent_draws(100)
+    if not draws:
+        log_info("⚠️ Δεν βρέθηκαν κληρώσεις.")
+        return
+
+    result = analyze_draws(draws)
+    most_common = result.get("most_common_numbers", [])
+
+    print("\n📈 Πιο Συχνοί Αριθμοί (Top):")
+    print("-" * 30)
+    for number, count in most_common:
+        print(f"Αριθμός: {number:<2} | Εμφανίσεις: {count}")
+    print("-" * 30)
+
+if __name__ == '__main__':
+    main()

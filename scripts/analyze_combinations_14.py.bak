@@ -1,0 +1,46 @@
+import pandas as pd
+import os
+import itertools
+from collections import Counter
+import time
+
+start_time = time.time()
+
+# 📁 Διαδρομή αρχείων
+input_path = "data/kino_draws.csv"
+output_path = "output/top_14_combinations.csv"
+os.makedirs("output", exist_ok=True)
+
+# ✅ Φόρτωση δεδομένων
+try:
+    df = pd.read_csv(input_path)
+    recent_df = df.tail(500)  # Ανάλυση τελευταίων 500 κληρώσεων
+
+    number_columns = [col for col in df.columns if col.startswith("num_")]
+    recent_draws = recent_df[number_columns].values.tolist()
+
+    # 🧠 Συλλογή 14άδων
+    all_combinations = []
+    for draw in recent_draws:
+        draw = sorted(set(draw))
+        if len(draw) >= 14:
+            combs = itertools.combinations(draw, 14)
+            all_combinations.extend(combs)
+
+    # 📊 Συχνότητες
+    counter = Counter(all_combinations)
+    most_common = counter.most_common(10)
+
+    # 💾 Αποθήκευση
+    result_df = pd.DataFrame(most_common, columns=["Combination", "Frequency"])
+    result_df.to_csv(output_path, index=False)
+
+    elapsed = time.time() - start_time
+    print("✅ Οι πιο συχνές 14άδες υπολογίστηκαν και αποθηκεύτηκαν!")
+    print(result_df)
+    print(f"⏱️ Χρόνος εκτέλεσης: {elapsed:.2f} δευτερόλεπτα")
+
+except FileNotFoundError:
+    print(f"❌ Το αρχείο δεν βρέθηκε: {input_path}")
+except Exception as e:
+    print(f"❌ Σφάλμα: {e}")

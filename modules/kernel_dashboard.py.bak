@@ -1,0 +1,49 @@
+
+import streamlit as st
+import os
+import pandas as pd
+import datetime
+
+st.set_page_config(page_title="KINO OS Kernel Integrator", layout="wide")
+
+st.title("🧠 KINO OS Kernel Integrator")
+st.subheader("Ολοκληρωμένος Πυρήνας του Prediction System")
+
+st.markdown("Αυτό το dashboard λειτουργεί ως **κεντρικός ενοποιητής** όλων των υποσυστημάτων του KINO Prediction System. Παρακάτω εμφανίζεται λίστα με όλα τα ενεργά modules:")
+
+# Αναζήτηση φακέλων που περιέχουν τα modules
+modules_dir = "modules"
+active_modules = []
+
+if os.path.exists(modules_dir):
+    active_modules = sorted([
+        name for name in os.listdir(modules_dir)
+        if os.path.isdir(os.path.join(modules_dir, name))
+    ])
+    st.success(f"✅ Εντοπίστηκαν {len(active_modules)} ενεργά modules.")
+else:
+    st.warning("⚠️ Ο φάκελος `modules/` δεν βρέθηκε.")
+
+# Προβολή ενεργών modules
+for module in active_modules:
+    st.markdown(f"- ✅ **{module}**")
+
+st.markdown("---")
+st.subheader("📊 Κεντρικός Έλεγχος & Κατάσταση")
+
+placeholder = st.empty()
+if st.button("🔁 Επαναφόρτωση κατάστασης"):
+    st.rerun()
+
+with st.expander("🧠 Προβολή Kernel Log", expanded=False):
+    log_path = "kernel_output/kernel_log.txt"
+    if os.path.exists(log_path):
+        with open(log_path, "r", encoding="utf-8") as f:
+            log_content = f.read()
+        st.code(log_content, language="text")
+    else:
+        st.info("Δεν βρέθηκε αρχείο kernel_log.txt")
+
+st.sidebar.title("📅 Συστήματος")
+st.sidebar.write(f"Ημερομηνία: {datetime.datetime.now().strftime('%d/%m/%Y')}")
+

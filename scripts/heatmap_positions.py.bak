@@ -1,0 +1,43 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+# Ρυθμίσεις εμφάνισης με seaborn (σωστά)
+sns.set_theme(style="whitegrid", palette="rocket", font_scale=1.1)
+
+# Φόρτωση δεδομένων
+df = pd.read_csv("kino_data.csv")
+
+# Επιλογή αριθμητικών στηλών
+number_columns = [f'num_{i}' for i in range(1, 21)]
+number_data = df[number_columns]
+
+# Frequency πίνακας αριθμού vs θέσης
+heatmap_data = pd.DataFrame(0, index=range(1, 81), columns=range(1, 21))
+
+for pos in range(20):
+    values = number_data.iloc[:, pos]
+    for number in values:
+        heatmap_data.at[number, pos + 1] += 1
+
+# Σχεδίαση
+plt.figure(figsize=(16, 9))
+ax = sns.heatmap(heatmap_data, cmap="YlGnBu", linewidths=0.5, linecolor='white')
+
+plt.title("Θέσεις αριθμών σε Kino κληρώσεις", fontsize=16, weight='bold', pad=20)
+plt.xlabel("Θέση (1-20)", fontsize=12)
+plt.ylabel("Αριθμός (1-80)", fontsize=12)
+plt.xticks(rotation=0)
+plt.yticks(rotation=0)
+
+# Δημιουργία φακέλου export αν δεν υπάρχει
+os.makedirs("output", exist_ok=True)
+
+# Αποθήκευση
+plt.tight_layout()
+plt.savefig("output/heatmap_positions.png", dpi=300)
+plt.show()
+
+
+

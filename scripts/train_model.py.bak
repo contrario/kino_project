@@ -1,0 +1,104 @@
+# scripts/train_model.py
+
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+import os
+import ast
+
+def numbers_to_vector(numbers, max_number=80):
+    """Μετατρέπει λίστα αριθμών σε δυαδικό vector παρουσίας."""
+    vector = [0] * max_number
+    for n in numbers:
+        if isinstance(n, int) and 1 <= n <= max_number:
+            vector[n - 1] = 1
+    return vector
+
+# 📥 Φόρτωση dataset
+dataset_path = os.path.join("data", "kino_dataset_cleaned.csv")
+df = pd.read_csv(dataset_path)
+print(f"✅ Dataset φορτώθηκε: {df.shape}")
+
+# 🔍 Αφαίρεση μη έγκυρων labels (όχι string ή λίστα)
+df = df[df["label"].apply(lambda x: isinstance(x, (str, list)))]
+
+import pandas as pd
+import numpy as np
+import os
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import ast
+
+# === Ρύθμιση διαδρομών ===
+DATA_PATH = "data/kino_dataset_cleaned.csv"
+MODEL_PATH = "models/best_model.pkl"
+
+# === Δημιουργία διανύσματος από λίστα αριθμών ===
+def numbers_to_vector(numbers):
+    vector = np.zeros(80, dtype=int)
+    for n in numbers:
+        if 1 <= n <= 80:
+            vector[n - 1] = 1
+    return vector
+
+# === Μετατροπή label με ασφάλεια ===
+def parse_label(x):
+    try:
+        if isinstance(x, str):
+            x = ast.literal_eval(x)
+        if isinstance(x, list):
+            return numbers_to_vector(x)
+    except Exception:
+        return None
+    return None
+
+# === Φόρτωση δεδομένων ===
+if not os.path.exists(DATA_PATH):
+    print(f"❌ Δεν βρέθηκε το αρχείο: {DATA_PATH}")
+    exit()
+
+df = pd.read_csv(DATA_PATH)
+print(f"✅ Dataset φορτώθηκε: {df.shape}")
+
+# === Εφαρμογή μετατροπής ===
+df["vector"] = df["label"].apply(parse_label)
+
+# === Φιλτράρισμα έγκυρων τιμών ===
+df = df[df["vector"].notna()]
+print(f"📊 Έγκυρα παραδείγματα μετά τη μετατροπή: {len(df)}")
+
+if df.empty:
+    print("❌ Δεν υπάρχουν έγκυρα δεδομένα για εκπαίδευση.")
+    exit()
+
+# === Προετοιμασία X και y ===
+X = df.drop(columns=["label", "vector"]).values
+y = np.vstack(df["vector"].values)
+
+print(f"📊 X shape: {X.shape}")
+print(f"📊 y shape: {y.shape}")
+
+# === Διαχωρισμός σε train/test ===
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# === Εκπαίδευση μοντέλου ===
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+print("✅ Μοντέλο εκπαιδεύτηκε")
+
+# === Αξιολόγηση ===
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f"📈 Accuracy: {accuracy:.4f}")
+
+# === Αποθήκευση μοντέλου ===
+os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+joblib.dump(model, MODEL_PATH)
+print(f"✅ Το μοντέλο αποθηκεύτηκε στο: {MODEL_PATH}")
+
+
+

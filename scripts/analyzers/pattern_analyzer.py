@@ -1,0 +1,39 @@
+import sys
+import os
+
+# ➤ Προσθέτουμε το path για να βρίσκει τα modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from scripts.utils.logger import log_info  # Σωστό import με πλήρη διαδρομή
+
+def analyze_patterns(draws):
+    """
+    Αναλύει μοτίβα από τις κληρώσεις ΚΙΝΟ.
+    Π.χ. παρακολουθεί την επαναληψιμότητα αριθμών, ζεύγη κ.λπ.
+    """
+    log_info("Ξεκίνησε η ανάλυση μοτίβων...")
+
+    # Παράδειγμα: Καταμέτρηση εμφάνισης κάθε αριθμού
+    frequency = {}
+    for draw in draws:
+        for number in draw:
+            frequency[number] = frequency.get(number, 0) + 1
+
+    sorted_freq = dict(sorted(frequency.items(), key=lambda item: item[1], reverse=True))
+
+    log_info("Ανάλυση μοτίβων ολοκληρώθηκε.")
+    return sorted_freq
+
+
+# Παράδειγμα χρήσης για test
+if __name__ == "__main__":
+    # Παράδειγμα δεδομένων (λίστα από λίστες με 20 αριθμούς η κάθε μία)
+    sample_draws = [
+        [5, 12, 23, 31, 40, 45, 48, 51, 56, 60, 61, 63, 66, 67, 70, 72, 75, 77, 79, 80],
+        [1, 5, 9, 12, 14, 22, 30, 34, 35, 40, 42, 45, 48, 51, 60, 66, 67, 70, 79, 80]
+    ]
+
+    results = analyze_patterns(sample_draws)
+    print("📊 Συχνότητες αριθμών:")
+    for number, count in results.items():
+        print(f"{number}: {count}")

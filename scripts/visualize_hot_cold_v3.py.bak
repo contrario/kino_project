@@ -1,0 +1,95 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import time
+import os
+
+start_time = time.time()
+
+# Ρυθμίσεις εμφάνισης
+sns.set(style='whitegrid')
+plt.rcParams['axes.labelsize'] = 10
+plt.rcParams['axes.titlesize'] = 12
+
+# Ρυθμίσεις φακέλου αποθήκευσης
+os.makedirs('charts', exist_ok=True)
+
+# Ρύθμιση: Πόσοι αριθμοί να εμφανίζονται ανά γράφημα
+TOP_N = 20
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import time
+import os
+
+start_time = time.time()
+sns.set(style='whitegrid')
+plt.rcParams['axes.labelsize'] = 10
+plt.rcParams['axes.titlesize'] = 12
+
+os.makedirs('charts', exist_ok=True)
+TOP_N = 20
+
+# Ανάγνωση δεδομένων
+df = pd.read_csv('results/number_frequency.csv')
+df = df.sort_values(by='Frequency', ascending=False)
+
+# ✅ Γράφημα 1: Συνολική συχνότητα
+plt.figure(figsize=(14, 6))
+sns.barplot(data=df.head(TOP_N), x='Number', y='Frequency', hue='Number', palette='viridis', dodge=False, legend=False)
+plt.title(f'Top-{TOP_N} Αριθμοί με τη Μεγαλύτερη Συχνότητα')
+plt.xlabel('Αριθμός')
+plt.ylabel('Συχνότητα')
+plt.xticks(rotation=0)
+
+for index, row in df.head(TOP_N).iterrows():
+    plt.text(x=index, y=row['Frequency'] + 0.5, s=row['Frequency'], ha='center', fontsize=8)
+
+plt.tight_layout(pad=1.5)
+plt.savefig('charts/all_frequencies.png')
+plt.savefig('charts/all_frequencies.pdf')
+plt.close()
+
+# ✅ Γράφημα 2: Hot Numbers
+df_hot = pd.read_csv('results/hot_numbers.csv')
+df_hot = df_hot.sort_values(by='Frequency', ascending=False)
+
+plt.figure(figsize=(10, 5))
+sns.barplot(data=df_hot, x='Number', y='Frequency', hue='Number', palette='Reds', dodge=False, legend=False)
+plt.title('Top-10 Hot Αριθμοί')
+plt.xlabel('Αριθμός')
+plt.ylabel('Συχνότητα')
+
+for index, row in df_hot.iterrows():
+    plt.text(x=index, y=row['Frequency'] + 0.5, s=row['Frequency'], ha='center', fontsize=8)
+
+plt.tight_layout(pad=1.5)
+plt.savefig('charts/hot_numbers.png')
+plt.savefig('charts/hot_numbers.pdf')
+plt.close()
+
+# ✅ Γράφημα 3: Cold Numbers
+df_cold = pd.read_csv('results/cold_numbers.csv')
+df_cold = df_cold.sort_values(by='Frequency', ascending=False)
+
+plt.figure(figsize=(10, 5))
+sns.barplot(data=df_cold, x='Number', y='Frequency', hue='Number', palette='Blues', dodge=False, legend=False)
+plt.title('Top-10 Cold Αριθμοί')
+plt.xlabel('Αριθμός')
+plt.ylabel('Συχνότητα')
+
+for index, row in df_cold.iterrows():
+    plt.text(x=index, y=row['Frequency'] + 0.5, s=row['Frequency'], ha='center', fontsize=8)
+
+plt.tight_layout(pad=1.5)
+plt.savefig('charts/cold_numbers.png')
+plt.savefig('charts/cold_numbers.pdf')
+plt.close()
+
+# Τελικό μήνυμα
+duration = round(time.time() - start_time, 2)
+print("✅ Ολοκληρώθηκε η δημιουργία όλων των γραφημάτων (v3) χωρίς warnings.")
+print("📂 Αποθηκεύτηκαν σε PNG και PDF στον φάκελο 'charts/'")
+print(f"⏱️ Χρόνος εκτέλεσης: {duration} sec")
+

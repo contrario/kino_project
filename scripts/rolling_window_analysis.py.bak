@@ -1,0 +1,36 @@
+# scripts/rolling_window_analysis.py
+
+import pandas as pd
+import os
+
+# 🔧 Ρυθμίσεις
+window_size = 200   # Πόσες τελευταίες κληρώσεις θα αναλύσουμε
+top_n = 20          # Πόσοι πιο συχνοί αριθμοί θα επιστραφούν
+
+# 📂 Διαδρομή για προεπεξεργασμένα δεδομένα
+input_file = os.path.join('..', 'data', 'kino_data_prepared.csv')
+
+# 🔁 Ανάγνωση δεδομένων
+df = pd.read_csv(input_file)
+
+# ✅ Φιλτράρουμε τις τελευταίες N κληρώσεις
+df_recent = df.tail(window_size)
+
+# 📊 Μαζεύουμε όλους τους αριθμούς σε μια λίστα
+all_numbers = df_recent[
+    [f'number_{i}' for i in range(1, 21)]
+].values.ravel()
+
+# 📈 Υπολογισμός συχνοτήτων
+freq_series = pd.Series(all_numbers).value_counts().sort_values(ascending=False)
+
+# 🎯 Επιλογή των Top-N αριθμών
+top_numbers = freq_series.head(top_n).index.tolist()
+
+# 📤 Αποθήκευση αποτελεσμάτων (προαιρετικό)
+output_file = os.path.join('..', 'outputs', f'top_{top_n}_numbers.csv')
+pd.DataFrame({'number': top_numbers}).to_csv(output_file, index=False)
+
+# 📃 Εμφάνιση στην οθόνη
+print(f"📊 Τελευταίες {window_size} κληρώσεις — Συχνότεροι {top_n} αριθμοί:")
+print(top_numbers)

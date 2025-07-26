@@ -1,0 +1,28 @@
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def check_csv(filepath):
+    if not os.path.exists(filepath):
+        return f"❌ Το αρχείο {filepath} δεν βρέθηκε."
+    df = pd.read_csv(filepath)
+    if df.empty:
+        return "❌ Το αρχείο CSV είναι άδειο."
+    required_cols = [f'num{i}' for i in range(1, 21)]
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        return f"❌ Λείπουν οι στήλες: {missing}"
+    return "✅ Το CSV είναι έγκυρο."
+
+def test_heatmap_generator():
+    try:
+        import visualizations.animated_heatmap as heatmap
+        return "✅ Το heatmap φορτώθηκε επιτυχώς."
+    except Exception as e:
+        return f"❌ Σφάλμα στο heatmap: {str(e)}"
+
+if __name__ == "__main__":
+    print("🔎 Έλεγχος δεδομένων...")
+    print(check_csv("..\\..\\data\\kino_data_prepared.csv"))
+    print("🧪 Έλεγχος heatmap script...")
+    print(test_heatmap_generator())

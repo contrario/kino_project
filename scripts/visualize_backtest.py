@@ -1,0 +1,28 @@
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ➤ Φτιάχνουμε το path του αρχείου με τρόπο που δουλεύει παντού
+# Το __file__ δείχνει το τρέχον αρχείο (visualize_backtest.py)
+base_dir = os.path.dirname(os.path.abspath(__file__))           # Ο φάκελος του script
+file_path = os.path.join(base_dir, "backtest_results.csv")      # Πλήρης διαδρομή για το αρχείο
+
+# ➤ Έλεγχος αν υπάρχει το αρχείο
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"Δεν βρέθηκε το αρχείο: {file_path}")
+
+# ➤ Φόρτωση του CSV
+df = pd.read_csv(file_path)
+
+# ➤ Δημιουργία γραφήματος: Κατανομή των επιτυχιών (π.χ. πόσες φορές έπιασε 3, 4, 5 αριθμούς)
+plt.figure(figsize=(10, 6))
+df['hits'].value_counts().sort_index().plot(kind='bar', color='skyblue', edgecolor='black')
+plt.title("Κατανομή Επιτυχιών στις Κληρώσεις", fontsize=14)
+plt.xlabel("Αριθμός επιτυχιών (σε 12 αριθμούς)", fontsize=12)
+plt.ylabel("Πλήθος εμφανίσεων", fontsize=12)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.xticks(rotation=0)
+plt.tight_layout()
+plt.show()
+
+

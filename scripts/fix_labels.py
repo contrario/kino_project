@@ -1,0 +1,25 @@
+import os
+import pandas as pd
+
+# Paths
+input_path = "data/kino_dataset_cleaned.csv"
+output_path = "data/kino_dataset_fixed.csv"
+
+# Φόρτωση
+df = pd.read_csv(input_path)
+
+def is_valid_label(label):
+    if isinstance(label, list) and len(label) == 20 and all(isinstance(n, int) and 1 <= n <= 80 for n in label):
+        return True
+    return False
+
+# Αν το label είναι string, το μετατρέπουμε
+df['label'] = df['label'].apply(lambda x: eval(x) if isinstance(x, str) else x)
+
+# Φιλτράρισμα
+valid_df = df[df['label'].apply(is_valid_label)]
+
+# Αποθήκευση
+valid_df.to_csv(output_path, index=False)
+print(f"✅ Αποθηκεύτηκαν {len(valid_df)} έγκυρες εγγραφές στο αρχείο: {output_path}")
+

@@ -1,0 +1,44 @@
+# analyze_combinations_12.py
+
+import pandas as pd
+from itertools import combinations
+from collections import Counter
+import os
+
+# 🔍 Βήμα 1: Έλεγχος αν υπάρχει το αρχείο
+dataset_path = os.path.join("data", "kino_draws.csv")
+if not os.path.exists(dataset_path):
+    print(f"❌ Το αρχείο δεν βρέθηκε: {dataset_path}")
+    exit()
+
+# 📥 Βήμα 2: Φόρτωση δεδομένων
+df = pd.read_csv(dataset_path)
+
+# ✅ Έλεγχος στήλες
+expected_columns = [f'num_{i}' for i in range(1, 21)]
+if not all(col in df.columns for col in expected_columns):
+    print(f"❌ Οι αναμενόμενες στήλες δεν βρέθηκαν.")
+    print(f"📌 Οι στήλες που υπάρχουν είναι: {list(df.columns)}")
+    exit()
+
+# 🔄 Βήμα 3: Συλλογή αριθμών ανά κλήρωση
+draw_numbers = df[expected_columns].values.tolist()
+
+# 🧮 Βήμα 4: Υπολογισμός όλων των 12άδων και καταμέτρηση
+counter = Counter()
+for draw in draw_numbers:
+    draw_combinations = combinations(sorted(draw), 12)
+    counter.update(draw_combinations)
+
+# 📊 Βήμα 5: Ταξινόμηση κατά συχνότητα και αποθήκευση
+most_common_combinations = counter.most_common(10)
+results_df = pd.DataFrame(most_common_combinations, columns=['Combination', 'Frequency'])
+
+# 💾 Αποθήκευση σε CSV
+output_path = os.path.join("output", "top_12_combinations.csv")
+os.makedirs("output", exist_ok=True)
+results_df.to_csv(output_path, index=False)
+
+# ✅ Μήνυμα επιτυχίας
+print("✅ Οι πιο συχνές 12άδες υπολογίστηκαν και αποθηκεύτηκαν!")
+print(results_df)

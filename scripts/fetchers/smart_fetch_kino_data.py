@@ -1,0 +1,40 @@
+import os
+from datetime import datetime, timedelta
+import requests
+from scripts.utils.logger import log_info, log_error
+
+
+def fetch_recent_draws(limit=100):
+    """
+    Fetches recent KINO draws with fallback στις προηγούμενες μέρες αν η σημερινή αποτύχει.
+    """
+    try:
+        attempts = 3  # δοκιμάζει τις 3 τελευταίες ημέρες
+        all_draws = []
+
+        for i in range(attempts):
+            day = datetime.today() - timedelta(days=i)
+            url = f"https://api.opap.gr/draws/v3.0/1100/draw-date/{day.date()}/{day.date()}"
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                draws = data.get("content", [])
+                all_draws.extend(draws)
+                if len(all_draws) >= limit:
+                    break
+
+        if all_draws:
+            log_info(f"📥 Επιτυχής ανάκτηση {min(limit, len(all_draws))} κληρώσεων.")
+            return all_draws[-limit:]
+        else:
+            raise Exception("Δεν βρέθηκαν κληρώσεις στις τελευταίες 3 ημέρες.")
+
+    except Exception as e:
+        log_error(f"❌ Σφάλμα κατά την ανάκτηση δεδομένων: {e}")
+        return None
+
+
+if __name__ == "__main__":
+    fetch_recent_draws(10)
+
+

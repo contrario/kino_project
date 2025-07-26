@@ -1,0 +1,38 @@
+import requests
+import pandas as pd
+from datetime import datetime, timedelta
+import os
+
+# 🔧 Ρύθμιση περιόδου (π.χ. τελευταίες 3 ημέρες)
+days_back = 3
+to_date = datetime.today().date()
+from_date = to_date - timedelta(days=days_back)
+
+# 🔗 URL API
+url = f"https://api.opap.gr/draws/v3.0/1100/draw-date/{from_date}/{to_date}"
+
+print(f"📡 Ανάκτηση δεδομένων από {from_date} έως {to_date}...")
+
+# 🔁 Ανάκτηση
+response = requests.get(url)
+data = response.json()
+
+# 📦 Επεξεργασία
+records = []
+for draw in data.get("content", []):
+    record = {
+        "drawId": draw.get("drawId"),
+        "drawTime": draw.get("drawTime"),
+        "numbers": ";".join(map(str, draw.get("winningNumbers", {}).get("list", [])))
+    }
+    records.append(record)
+
+df = pd.DataFrame(records)
+
+# 📂 Αποθήκευση
+output_dir = "../data"
+os.makedirs(output_dir, exist_ok=True)
+output_file = os.path.join(output_dir, "kino_full_data.csv")
+df.to_csv(output_file, index=False)
+
+print(f"✅ Αποθηκεύτηκαν {len(df)} κληρώσεις στο αρχείο: {output_file}")

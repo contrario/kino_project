@@ -1,0 +1,44 @@
+import os
+import pandas as pd
+from itertools import combinations
+from collections import Counter
+
+# Βρίσκουμε τη σωστή διαδρομή
+csv_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'kino_data.csv')
+
+# Έλεγχος αν υπάρχει το αρχείο
+if not os.path.exists(csv_path):
+    print(f"❌ Το αρχείο δεν βρέθηκε: {csv_path}")
+    exit()
+
+# Φόρτωση του αρχείου
+df = pd.read_csv(csv_path)
+
+# Εξαγωγή των 20 αριθμών από τις στήλες num_1 έως num_20
+number_columns = [f'num_{i}' for i in range(1, 21)]
+
+if not all(col in df.columns for col in number_columns):
+    print("❌ Δεν υπάρχουν όλες οι στήλες num_1 έως num_20.")
+    print(f"📌 Βρέθηκαν οι στήλες: {list(df.columns)}")
+    exit()
+
+draws = df[number_columns].values.tolist()
+
+# Υπολογισμός των 5άδων
+all_combinations = []
+for draw in draws:
+    all_combinations.extend(combinations(sorted(draw), 5))
+
+# Καταμέτρηση των συχνότερων 5άδων
+counter = Counter(all_combinations)
+most_common_combos = pd.DataFrame(counter.most_common(10), columns=['Combination', 'Frequency'])
+
+# Αποθήκευση αποτελεσμάτων
+output_folder = os.path.join(os.path.dirname(__file__), '..', 'results')
+os.makedirs(output_folder, exist_ok=True)
+output_path = os.path.join(output_folder, 'most_common_combinations_5.csv')
+most_common_combos.to_csv(output_path, index=False)
+
+# Εμφάνιση αποτελεσμάτων
+print("✅ Οι πιο συχνές 5άδες υπολογίστηκαν και αποθηκεύτηκαν!")
+print(most_common_combos)

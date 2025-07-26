@@ -1,0 +1,43 @@
+import os
+import sys
+import io
+import time
+
+# Εξασφάλιση UTF-8 encoding για ασφαλή εκτύπωση
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+def safe_str(obj):
+    return str(obj) if obj is not None else "[None]"
+
+def initialize_environment():
+    print("🛠 Εκκίνηση Περιβάλλοντος KINO Kernel...")
+
+    # Δημιουργία βασικών φακέλων
+    required_dirs = ["data", "models", "outputs", "results", "logs"]
+    for directory in required_dirs:
+        if directory:
+            full_path = os.path.join(os.getcwd(), directory)
+            try:
+                if not os.path.exists(full_path):
+                    os.makedirs(full_path)
+                    print(f"[+] Δημιουργήθηκε φάκελος: {full_path}")
+                else:
+                    print(f"[✓] Υπάρχει ήδη φάκελος: {full_path}")
+            except Exception as e:
+                print(f"[Σφάλμα]: {safe_str(e)}")
+
+    # Μεταβλητές περιβάλλοντος (προαιρετικές)
+    try:
+        os.environ["KINO_ENV"] = "active"
+        os.environ["KERNEL_STATUS"] = "initialized"
+    except Exception as e:
+        print(f"[Σφάλμα περιβάλλοντος]: {safe_str(e)}")
+
+    time.sleep(1)
+    print("✅ Το περιβάλλον φορτώθηκε επιτυχώς")
+
+if __name__ == "__main__":
+    try:
+        initialize_environment()
+    except Exception as e:
+        print(f"[ΣΦΑΛΜΑ] Κατά την εκκίνηση: {safe_str(e)}")

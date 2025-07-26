@@ -1,0 +1,19 @@
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+import joblib
+
+# Φόρτωση dataset
+df = pd.read_csv("data/kino_dataset.csv")
+X = df.drop("target", axis=1)
+y = df["target"]
+
+# Εκπαίδευση μοντέλου
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X, y)
+
+# Αποθήκευση μοντέλου
+joblib.dump(model, "models/best_model.pkl")
+print("✅ Το μοντέλο αποθηκεύτηκε επιτυχώς στο models/best_model.pkl")
+
+
+

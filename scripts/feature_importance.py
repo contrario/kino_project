@@ -1,0 +1,37 @@
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.ensemble import RandomForestClassifier
+
+# 🔧 Δημιουργία φακέλου outputs αν δεν υπάρχει
+os.makedirs('outputs', exist_ok=True)
+
+# 🔹 1. Φόρτωση δεδομένων
+df = pd.read_csv('data/kino_features_enriched.csv')
+
+# 🔹 2. Drop στήλες που δεν είναι features
+X = df.drop(columns=['draw_id', 'draw_time', 'is_7_hit'])
+y = df['is_7_hit']
+
+# 🔹 3. Εκπαίδευση μοντέλου
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X, y)
+
+# 🔹 4. Λήψη σημαντικότητας χαρακτηριστικών
+importances = model.feature_importances_
+features = X.columns
+importance_df = pd.DataFrame({'feature': features, 'importance': importances})
+importance_df = importance_df.sort_values(by='importance', ascending=False)
+
+# 🔹 5. Αποθήκευση αποτελεσμάτων
+importance_df.to_csv('outputs/feature_importance.csv', index=False)
+print("✅ Αποθηκεύτηκε το feature_importance.csv")
+
+# 🔹 6. Γράφημα
+plt.figure(figsize=(12, 6))
+sns.barplot(x='importance', y='feature', data=importance_df.head(20))
+plt.title('Top 20 Σημαντικότερα Χαρακτηριστικά')
+plt.tight_layout()
+plt.savefig('outputs/feature_importance_plot.png')
+print("📊 Το γράφημα αποθηκεύτηκε στο outputs/feature_importance_plot.png")

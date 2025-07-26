@@ -1,0 +1,22 @@
+import os
+# scripts/analyze_kino_stats.py
+
+import pandas as pd
+from collections import Counter
+
+def analyze_draws(draws_df):
+    try:
+        # Εξαγωγή όλων των αριθμών από όλα τα draws
+        all_numbers = [num for sublist in draws_df['winning_numbers'] for num in sublist]
+
+        frequency = Counter(all_numbers)
+        sorted_freq = dict(sorted(frequency.items(), key=lambda x: x[1], reverse=True))
+
+        print("📌 Most Frequent Numbers:")
+        for num, freq in list(sorted_freq.items())[:10]:
+            print(f"Number {num}: {freq} times")
+
+        return sorted_freq
+    except Exception as e:
+        print(f"❌ Error in analyze_draws: {e}")
+        return {}

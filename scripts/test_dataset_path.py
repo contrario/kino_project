@@ -1,0 +1,8 @@
+import os
+
+file_path = os.path.join("data", "kino_draws.csv")
+
+if os.path.exists(file_path):
+    print("✅ Το αρχείο βρέθηκε!")
+else:
+    print("❌ Δεν βρέθηκε το αρχείο:", file_path)

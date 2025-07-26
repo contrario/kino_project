@@ -1,0 +1,51 @@
+import os
+import pandas as pd
+import json
+from collections import Counter
+
+def load_kino_data(csv_path: str) -> pd.DataFrame:
+    """
+    Φορτώνει τα δεδομένα από αρχείο CSV.
+    """
+    try:
+        df = pd.read_csv(csv_path)
+        return df
+    except Exception as e:
+        print(f"❌ Σφάλμα κατά τη φόρτωση του αρχείου: {e}")
+        return pd.DataFrame()
+
+def extract_numbers(df: pd.DataFrame) -> list:
+    """
+    Μετατρέπει τις σειρές από το πεδίο 'numbers' σε λίστες ακέραιων αριθμών.
+    """
+    if 'numbers' not in df.columns:
+        raise ValueError("Η στήλη 'numbers' δεν υπάρχει στο DataFrame.")
+
+    all_numbers = []
+    for row in df['numbers']:
+        try:
+            nums = [int(n) for n in str(row).split(';') if n.strip().isdigit()]
+            all_numbers.extend(nums)
+        except Exception as e:
+            print(f"⚠️ Σφάλμα κατά την επεξεργασία γραμμής: {e}")
+
+    return all_numbers
+
+def get_top_n_numbers(number_list: list, top_n: int = 20) -> list:
+    """
+    Υπολογίζει τους top-N πιο συχνούς αριθμούς.
+    """
+    counter = Counter(number_list)
+    most_common = counter.most_common(top_n)
+    return [num for num, count in most_common]
+
+def save_top_numbers_json(top_numbers: list, json_path: str):
+    """
+    Αποθηκεύει τους top αριθμούς σε αρχείο JSON.
+    """
+    try:
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(top_numbers, f, ensure_ascii=False, indent=2)
+        print(f"✅ Οι {len(top_numbers)} πιο συχνοί αριθμοί αποθηκεύτηκαν σε: {json_path}")
+    except Exception as e:
+        print(f"❌ Σφάλμα κατά την αποθήκευση JSON: {e}")

@@ -1,0 +1,59 @@
+import os
+import re
+
+def fix_open_encodings(code):
+    pattern = r'open\(([^,\n]+)(?![^)]*encoding\s*=)'
+    fixed_code = re.sub(pattern, r'open(\1, encoding="utf-8"', code)
+    return fixed_code
+
+def fix_path_concatenation(code):
+    # Αντικατάσταση πιθανών concatenations με None
+    pattern = r'(\w+)\s*\+\s*["\']'
+    lines = code.splitlines()
+    new_lines = []
+    for line in lines:
+        match = re.search(pattern, line)
+        if match:
+            var_name = match.group(1)
+            # Προσθέτουμε fallback αν είναι None
+            if f"{var_name} = " not in line:  # Αποφυγή μεταβλητής δήλωσης
+                new_line = line.replace(f"{var_name} +", f"({var_name} or '') +")
+                new_lines.append(new_line)
+                continue
+        new_lines.append(line)
+    return "\n".join(new_lines)
+
+def ensure_os_import(code):
+    if "import os" not in code:
+        return "import os\n" + code
+    return code
+
+def process_file(file_path):
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        original = f.read()
+
+    modified = fix_open_encodings(original)
+    modified = fix_path_concatenation(modified)
+    modified = ensure_os_import(modified)
+
+    if modified != original:
+        backup_path = file_path + ".bak"
+        with open(backup_path, "w", encoding="utf-8") as f:
+            f.write(original)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(modified)
+        print(f"[✔] Fixed: {file_path} (backup saved as {backup_path})")
+    else:
+        print(f"[OK] No changes: {file_path}")
+
+def scan_and_fix(directory):
+    print("🔧 Auto-fixing Python scripts in:", directory)
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".py"):
+                full_path = os.path.join(root, file)
+                process_file(full_path)
+
+if __name__ == "__main__":
+    project_root = os.path.dirname(__file__)
+    scan_and_fix(project_root)

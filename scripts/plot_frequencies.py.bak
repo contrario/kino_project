@@ -1,0 +1,52 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# 📍 Βρες τον φάκελο του script
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+input_file = os.path.join(BASE_DIR, "..", "data", "number_frequencies.csv")
+
+if not os.path.exists(input_file):
+    print(f"❌ Δεν βρέθηκε το αρχείο: {input_file}")
+    exit()
+
+# 📥 Φόρτωση δεδομένων
+df = pd.read_csv(input_file)
+df = df.sort_values(by="Number").reset_index(drop=True)
+
+# 🔝 Top 10 αριθμοί με τις μεγαλύτερες συχνότητες
+top10 = df.sort_values(by="Frequency", ascending=False).head(10)["Number"].tolist()
+
+# 🎨 Ορισμός χρωμάτων: κόκκινο για top10, μπλε για τους υπόλοιπους
+colors = ['red' if n in top10 else 'steelblue' for n in df['Number']]
+
+# 📊 Δημιουργία γραφήματος
+plt.figure(figsize=(14, 6))
+bars = plt.bar(df['Number'], df['Frequency'], color=colors)
+
+# 💬 Προσθήκη τιμών πάνω από τις μπάρες
+for bar in bars:
+    height = bar.get_height()
+    if height > 0:
+        plt.annotate(f'{int(height)}',
+                     xy=(bar.get_x() + bar.get_width() / 2, height),
+                     xytext=(0, 3),
+                     textcoords="offset points",
+                     ha='center', va='bottom', fontsize=8)
+
+# 🖼️ Ρυθμίσεις άξονες
+plt.xlabel("Αριθμός")
+plt.ylabel("Συχνότητα Εμφάνισης")
+plt.title("Συχνότητα Αριθμών KINO (Top 10 = Κόκκινο)")
+plt.xticks(rotation=90)
+plt.grid(axis='y', linestyle='--', alpha=0.5)
+
+# 💾 Αποθήκευση
+output_path = os.path.join(BASE_DIR, "..", "data", "frequency_plot.png")
+plt.tight_layout()
+plt.savefig(output_path, dpi=150)
+plt.show()
+
+print(f"✅ Το γράφημα αποθηκεύτηκε στο: {output_path}")
+
+

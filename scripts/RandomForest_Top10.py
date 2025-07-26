@@ -1,0 +1,54 @@
+import os
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from imblearn.over_sampling import SMOTE
+from collections import Counter
+
+# 📥 Φόρτωση δεδομένων
+df = pd.read_csv('data/kino_features.csv')
+
+# ✅ Ενημερωμένα top-10 features (μόνο υπάρχοντα)
+top10_features = ['num_8', 'num_4', 'num_14', 'gap_1', 'gap_17', 'gap_43', 'num_12', 'num_5', 'freq_8', 'freq_4']
+
+print("\n📌 Χρησιμοποιούνται τα Top-10 features:")
+print(top10_features)
+
+# 🎯 Στόχος
+y = df['is_7_hit']
+X = df[top10_features]
+
+# 🔄 SMOTE για ισορροπία
+print("\n🔍 Κατανομή 'is_7_hit':")
+print(y.value_counts())
+
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X, y)
+
+print("\n🔁 Νέα κατανομή μετά το SMOTE:")
+print(Counter(y_resampled))
+
+# ✂️ Train/Test split
+X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.3, random_state=42)
+
+# 🌳 Random Forest
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+
+# 📊 Αξιολόγηση
+acc = accuracy_score(y_test, y_pred)
+prec = precision_score(y_test, y_pred)
+rec = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+
+print(f"\n🎯 Accuracy: {acc:.2f}")
+print(f"📌 Precision: {prec:.2f}")
+print(f"📈 Recall: {rec:.2f}")
+print(f"🧪 F1-Score: {f1:.2f}")
+
+# 🔁 Cross-validation
+scores = cross_val_score(model, X_resampled, y_resampled, cv=5)
+print(f"\n✅ Αξιολογήσεις με Cross-Validation: {scores}")
+print(f"📊 Μέση ακρίβεια: {scores.mean():.4f}")

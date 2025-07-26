@@ -1,0 +1,14 @@
+# create_init_files.py
+
+import os
+
+def create_init_files(root_dir):
+    for foldername, subfolders, filenames in os.walk(root_dir):
+        init_path = os.path.join(foldername, '__init__.py')
+        if not os.path.exists(init_path):
+            with open(init_path, 'w') as f:
+                f.write('# init\n')
+            print(f'✅ Δημιουργήθηκε: {init_path}')
+
+if __name__ == '__main__':
+    create_init_files('scripts')

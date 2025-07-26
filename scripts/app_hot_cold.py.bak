@@ -1,0 +1,44 @@
+import streamlit as st
+import pandas as pd
+import os
+
+# -----------------------------
+# Ρυθμίσεις
+# -----------------------------
+st.set_page_config(page_title="KINO Hot & Cold Numbers", layout="centered")
+
+# -----------------------------
+# Φόρτωση δεδομένων
+# -----------------------------
+DATA_PATH = os.path.join("..", "data", "number_frequencies.csv")
+
+@st.cache_data
+def load_data(path):
+    try:
+        df = pd.read_csv(path)
+        df = df.sort_values(by="frequency", ascending=False).reset_index(drop=True)
+        return df
+    except FileNotFoundError:
+        st.error(f"Το αρχείο δεν βρέθηκε: {path}")
+        return pd.DataFrame(columns=["number", "frequency"])
+
+data = load_data(DATA_PATH)
+
+# -----------------------------
+# Προβολή
+# -----------------------------
+st.title("🔥 KINO Hot & Cold Numbers")
+
+if data.empty:
+    st.warning("Δεν βρέθηκαν δεδομένα.")
+else:
+    st.subheader("🎯 Συχνότητες Αριθμών")
+    st.dataframe(data, use_container_width=True)
+
+    st.subheader("📈 Top 10 Hot Numbers")
+    st.write(data.head(10)[["number", "frequency"]])
+
+    st.subheader("❄️ Top 10 Cold Numbers")
+    st.write(data.tail(10).sort_values(by="frequency")[["number", "frequency"]])
+
+

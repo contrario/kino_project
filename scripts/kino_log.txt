@@ -1,0 +1,30 @@
+[2025-07-24 08:32:32,412] INFO: Overseer startup initiated
+[2025-07-24 08:32:32,484] CRITICAL: Overseer failed: Traceback (most recent call last):
+  File "C:\Users\Hlias\Documents\kino_project\kino_overseer.py", line 66, in start_overseer
+    heal_environment()
+  File "C:\Users\Hlias\Documents\kino_project\kino_overseer.py", line 56, in heal_environment
+    check_dependencies()
+  File "C:\Users\Hlias\Documents\kino_project\kino_overseer.py", line 20, in check_dependencies
+    __import__(module)
+  File "C:\Users\Hlias\Documents\kino_project\.venv\Lib\site-packages\streamlit\__init__.py", line 62, in <module>
+    from streamlit import config as _config
+  File "C:\Users\Hlias\Documents\kino_project\.venv\Lib\site-packages\streamlit\config.py", line 30, in <module>
+    from streamlit import config_util, development, env_util, file_util, util
+  File "C:\Users\Hlias\Documents\kino_project\.venv\Lib\site-packages\streamlit\config_util.py", line 20, in <module>
+    from streamlit import cli_util
+  File "C:\Users\Hlias\Documents\kino_project\.venv\Lib\site-packages\streamlit\cli_util.py", line 59, in <module>
+    webbrowser.open(url)
+    ^^^^^^^^^^
+NameError: name 'webbrowser' is not defined. Did you forget to import 'webbrowser'
+
+2025-07-24 08:34:08,099 - WARNING - Missing file: multi_fixer_web.py
+2025-07-24 08:34:08,099 - WARNING - Missing file: auto_fix_kernel.py
+2025-07-24 08:34:08,099 - WARNING - Missing file: kernel_dashboard.py
+2025-07-24 08:34:08,099 - WARNING - Missing file: initialize_kernel_env.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: streamlit_main.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: strategy_logger_dashboard.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: alert_notifier_dashboard.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: neuro_luck_dashboard.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: mnemonic_bias_dashboard.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: subconscious_influence_dashboard.py
+2025-07-24 08:34:08,100 - WARNING - Missing file: kino_data_fetcher.py

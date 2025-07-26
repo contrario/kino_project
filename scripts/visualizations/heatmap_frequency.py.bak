@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib.colors import Normalize
+import os
+
+# === ΡΥΘΜΙΣΕΙΣ ===
+csv_path = "../../data/kino_data.csv"  # Τροποποίησε το path αν χρειάζεται
+output_path = "../../data/kino_heatmap_full.png"
+last_n_draws = None  # π.χ. 500 για περιορισμό ή None για όλα
+
+# === ΔΙΑΒΑΣΜΑ ΔΕΔΟΜΕΝΩΝ ===
+df = pd.read_csv(csv_path)
+
+# Εντοπισμός στηλών με αριθμούς
+number_columns = [col for col in df.columns if col.startswith("num_")]
+if not number_columns:
+    raise ValueError("Δεν βρέθηκαν στήλες που ξεκινούν με 'num_'")
+
+# Περιορισμός σε πρόσφατες κληρώσεις
+if last_n_draws is not None:
+    df = df.tail(last_n_draws)
+
+# === ΥΠΟΛΟΓΙΣΜΟΣ ΣΥΧΝΟΤΗΤΑΣ ===
+all_numbers = df[number_columns].values.flatten()
+frequencies = {i: 0 for i in range(1, 81)}
+for number in all_numbers:
+    if 1 <= number <= 80:
+        frequencies[number] += 1
+
+# === GRID 8x10 ===
+grid = np.zeros((8, 10), dtype=int)
+numbers_grid = np.arange(1, 81).reshape((8, 10))
+for i in range(8):
+    for j in range(10):
+        num = numbers_grid[i, j]
+        grid[i, j] = frequencies[num]
+
+# === HEATMAP ===
+sns.set(style="whitegrid", font_scale=1.2)
+plt.figure(figsize=(12, 7))
+sns.heatmap(
+    grid,
+    annot=grid,
+    fmt="d",
+    cmap="YlOrRd",
+    linewidths=0.5,
+    cbar=True,
+    square=True,
+    norm=Normalize(vmin=0, vmax=np.max(grid))
+)
+
+# === ΔΙΑΚΟΣΜΗΣΗ ===
+plt.title("Heatmap Συχνοτήτων Αριθμών KINO", fontsize=16, pad=15)
+plt.xlabel("Στήλες αριθμών", fontsize=12)
+plt.ylabel("Γραμμές αριθμών", fontsize=12)
+plt.tight_layout()
+
+# === ΑΠΟΘΗΚΕΥΣΗ ===
+plt.savefig(output_path, bbox_inches='tight', transparent=True)
+plt.show()
+
+
+
+
+
+
+
+
+

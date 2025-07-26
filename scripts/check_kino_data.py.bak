@@ -1,0 +1,30 @@
+import pandas as pd
+import os
+
+# Διαδρομή αρχείου CSV
+csv_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'kino_data.csv')
+
+# Ανάγνωση αρχείου
+try:
+    df = pd.read_csv(csv_path)
+
+    print("✅ Το αρχείο φορτώθηκε επιτυχώς.")
+    print(f"📦 Συνολικές γραμμές: {len(df)}")
+    print("\n🔍 Πρώτες 10 γραμμές:\n")
+    print(df.head(10))
+
+    print("\n🧩 Στήλες που βρέθηκαν:")
+    print(df.columns)
+
+    expected_columns = ['draw_id', 'draw_time', 'winning_numbers']
+    missing = [col for col in expected_columns if col not in df.columns]
+
+    if not missing:
+        print("\n✅ Όλες οι αναμενόμενες στήλες υπάρχουν.")
+    else:
+        print(f"\n⚠️ Λείπουν οι εξής στήλες: {missing}")
+
+except FileNotFoundError:
+    print(f"❌ Δεν βρέθηκε το αρχείο: {csv_path}")
+except Exception as e:
+    print(f"❌ Σφάλμα κατά την ανάγνωση: {e}")

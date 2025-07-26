@@ -1,0 +1,20 @@
+import csv
+import os
+from datetime import datetime
+from scripts.utils.logger import log_info
+
+def save_data_to_csv(data, filepath):
+    """Αποθηκεύει λίστα κληρώσεων σε CSV αρχείο."""
+    file_exists = os.path.isfile(filepath)
+    with open(filepath, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(['draw_id', 'draw_time', 'numbers'])  # headers
+        for draw in data:
+            draw_id = draw['drawId']
+            draw_time = datetime.fromtimestamp(draw['drawTime'] / 1000).strftime('%Y-%m-%d %H:%M:%S')
+            numbers = ','.join(str(num) for num in draw['winningNumbers']['list'])
+            writer.writerow([draw_id, draw_time, numbers])
+    log_info(f"📁 Δεδομένα αποθηκεύτηκαν στο αρχείο: {filepath}")
+
+

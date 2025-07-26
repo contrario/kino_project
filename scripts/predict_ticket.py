@@ -1,0 +1,63 @@
+import os
+# scripts/predict_ticket.py
+
+import pandas as pd
+import numpy as np
+import joblib
+from collections import Counter
+
+# ----------------------------
+# 🔹 Top-10 features (τα ίδια με το training)
+top10_features = ['num_8', 'num_4', 'num_14', 'gap_1', 'gap_17', 'gap_43', 'num_12', 'num_5', 'freq_8', 'freq_4']
+
+# 🔹 Φόρτωση του εκπαιδευμένου μοντέλου
+model = joblib.load('models/random_forest_best.pkl')
+
+# ----------------------------
+# 🔹 Είσοδος χρήστη (12 αριθμοί)
+user_ticket = [int(x) for x in input("🎟️ Δώσε 12 αριθμούς ΚΙΝΟ χωρισμένους με κόμμα: ").split(',')]
+
+if len(user_ticket) != 12:
+    print("❌ Πρέπει να δώσεις ακριβώς 12 αριθμούς.")
+    exit()
+
+# ----------------------------
+# 🔹 Φόρτωση δεδομένων για να δημιουργήσουμε context (ιστορικά feature data)
+df = pd.read_csv('data/kino_features.csv')
+
+# Παίρνουμε την τελευταία γραμμή (τελευταίο draw) για να δημιουργήσουμε τα features του νέου δελτίου
+last_row = df.iloc[-1]
+
+# Δημιουργία feature row για το δελτίο
+new_data = {}
+
+for col in top10_features:
+    if col.startswith('num_'):
+        num = int(col.split('_')[1])
+        new_data[col] = 1 if num in user_ticket else 0
+    elif col.startswith('freq_'):
+        num = int(col.split('_')[1])
+        freq_col = f'freq_{num}'
+        new_data[col] = last_row[freq_col]
+    elif col.startswith('gap_'):
+        num = int(col.split('_')[1])
+        gap_col = f'gap_{num}'
+        new_data[col] = last_row[gap_col]
+    else:
+        new_data[col] = last_row[col]  # π.χ. std_deviation ή sum_total
+
+# Μετατροπή σε DataFrame
+input_df = pd.DataFrame([new_data])
+
+# ----------------------------
+# 🔮 Πρόβλεψη
+prediction = model.predict(input_df)[0]
+probability = model.predict_proba(input_df)[0][1]  # πιθανότητα για class 1 (7-hit)
+
+# ----------------------------
+# 🖨️ Αποτελέσματα
+print("\n📊 Προβλεπόμενα χαρακτηριστικά:")
+print(input_df)
+
+print("\n🎯 Πρόβλεψη:")
+print(f"➡️ {'7-hit' if prediction == 1 else 'Όχι 7-hit'} (Πιθανότητα: {probability:.2f})")

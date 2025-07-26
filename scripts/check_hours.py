@@ -1,0 +1,11 @@
+import os
+import pandas as pd
+
+# Διαβάζουμε τα δεδομένα
+df = pd.read_csv("../data/kino_data.csv")
+df['draw_time'] = pd.to_datetime(df['draw_time'])
+df['hour'] = df['draw_time'].dt.hour
+
+# Δείξε μοναδικές ώρες που υπάρχουν
+print("🕒 Μοναδικές Ώρες στο Dataset:")
+print(df['hour'].value_counts().sort_index())

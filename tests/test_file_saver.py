@@ -1,0 +1,29 @@
+import os
+import unittest
+from scripts.utils.file_saver import save_draws_to_csv
+import pandas as pd
+
+class TestFileSaver(unittest.TestCase):
+
+    def setUp(self):
+        self.test_draws = [
+            {
+                "drawId": 123,
+                "drawTime": 1650000000000,
+                "winningNumbers": {"list": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+            }
+        ]
+        self.test_file = "tests/test_draws.csv"
+
+    def test_save_draws_to_csv(self):
+        save_draws_to_csv(self.test_draws, self.test_file)
+        self.assertTrue(os.path.exists(self.test_file))
+
+        df = pd.read_csv(self.test_file)
+        self.assertEqual(len(df), 1)
+        self.assertIn('drawId', df.columns)
+        self.assertEqual(df.iloc[0]['drawId'], 123)
+
+    def tearDown(self):
+        if os.path.exists(self.test_file):
+            os.remove(self.test_file)

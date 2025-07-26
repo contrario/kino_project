@@ -1,0 +1,55 @@
+import requests
+import csv
+import os
+from datetime import datetime
+
+# Σωστό endpoint
+url = "https://api.opap.gr/draws/v3.0/1100/last-result-and-active"
+
+response = requests.get(url)
+data = response.json()
+last_draw = data["last"]
+
+draw_id = last_draw.get("drawId")
+draw_time = last_draw.get("drawTime")
+numbers = last_draw["winningNumbers"].get("list", [])
+
+print("Τελευταίο Draw:")
+print(f"ID: {draw_id}")
+print(f"Ώρα: {draw_time}")
+print(f"Αριθμοί: {numbers}")
+
+# Μετατροπή σε αναγνώσιμη ημερομηνία
+draw_datetime = datetime.fromtimestamp(draw_time / 1000).strftime("%Y-%m-%d %H:%M:%S")
+
+# Όνομα αρχείου
+filename = "kino_draws.csv"
+
+# Έλεγχος αν υπάρχει το draw_id ήδη στο αρχείο
+already_exists = False
+if os.path.exists(filename):
+    with open(filename, "r", newline="", encoding="utf-8") as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if str(draw_id) == row["draw_id"]:
+                already_exists = True
+                break
+
+# Αν δεν υπάρχει, το προσθέτουμε
+if not already_exists:
+    write_header = not os.path.exists(filename)
+    with open(filename, "a", newline="", encoding="utf-8") as csvfile:
+        fieldnames = ["draw_id", "draw_time", "numbers"]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+        if write_header:
+            writer.writeheader()
+
+        writer.writerow({
+            "draw_id": draw_id,
+            "draw_time": draw_datetime,
+            "numbers": ";".join(map(str, numbers))
+        })
+    print("✅ Προστέθηκε στο αρχείο.")
+else:
+    print("ℹ️ Το draw υπάρχει ήδη στο αρχείο.")
