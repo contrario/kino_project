@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: kino-project-ai
+    env: python
+    repo: https://github.com/contrario/kino_project_ai
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run kino_overseer_web.py --server.port=$PORT
+    autoDeploy: true
