@@ -1,66 +1,50 @@
 import streamlit as st
-import pandas as pd
-import os
-import datetime
-from pathlib import Path
+import requests
 
-# Paths
-PROJECT_ROOT = Path("kino_project")
-MODULES = [f"Module {i}" for i in range(1, 12)]
-MODULES_DIR = PROJECT_ROOT / "modules"
-LOGS_DIR = PROJECT_ROOT / "logs"
-OUTPUTS_DIR = PROJECT_ROOT / "outputs"
-WATCHDOG_DIR = PROJECT_ROOT / "watchdog"
+# === Telegram Settings ===
+TELEGRAM_BOT_TOKEN = "8393168645:AAG-acWe2Kdw_JXYPQ3ZvNYaBrb64lgivPA"
+TELEGRAM_CHAT_ID = "6046304883"
 
-# Δημιουργία φακέλων αν δεν υπάρχουν
-for path in [MODULES_DIR, LOGS_DIR, OUTPUTS_DIR, WATCHDOG_DIR]:
-    path.mkdir(parents=True, exist_ok=True)
+def send_telegram_message(message):
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    try:
+        response = requests.post(url, json=payload)
+        if response.status_code != 200:
+            print("Telegram error:", response.text)
+    except Exception as e:
+        print("Telegram exception:", str(e))
 
-# Dummy module execution status (θα συνδεθεί με real run στη συνέχεια)
-def get_module_status():
-    return pd.DataFrame({
-        "Module": MODULES,
-        "Status": ["Idle"] * len(MODULES),
-        "Last Run": ["-"] * len(MODULES),
-        "Success": [False] * len(MODULES)
-    })
+# === Streamlit App ===
+st.set_page_config(page_title="KINO Project Overseer", layout="wide", page_icon="🎬")
 
-# App Layout
-st.set_page_config(page_title="KINO Overseer Web Panel", layout="wide")
-st.markdown("""
-    <style>
-        .main { background-color: #111; color: white; }
-        .stButton > button { width: 100%; height: 3em; }
-    </style>
-""", unsafe_allow_html=True)
+st.markdown("<h1 style='color:white;'>🎬 KINO Overseer Interface</h1>", unsafe_allow_html=True)
+st.write("Welcome to the **Genesis Activation Panel** of the KINO Project.")
 
-st.title("🎯 KINO Overseer Web Panel")
-st.subheader("Ολοκληρωμένη Streamlit υποδομή επιπέδου CERN")
-st.markdown("**Αυτοδιόρθωση και παρακολούθηση όλων των module (1-11)**")
+with st.expander("🧠 Activate Genesis Modules"):
+    st.subheader("🧬 Genesis Control Layer")
 
-# Tabs για κάθε module
-tabs = st.tabs(MODULES)
+    if st.button("💡 Dimensional Harmonics Engine"):
+        from genesis_modules.dimensional_harmonics_engine import run as run_dhe
+        run_dhe()
+        st.success("✅ Dimensional Harmonics Engine synchronized.")
+        send_telegram_message("💡 *Dimensional Harmonics Engine* has been activated by Hlias.")
 
-# Status dashboard
-status_df = get_module_status()
-st.markdown("### 🔬 Module Overview Dashboard (Live)")
-st.dataframe(status_df, use_container_width=True)
+    if st.button("🧬 Genetic Pattern Modulator"):
+        from genesis_modules.genetic_pattern_modulator import run as run_gpm
+        run_gpm()
+        st.success("✅ Genetic Pattern Modulator synchronized.")
+        send_telegram_message("🧬 *Genetic Pattern Modulator* has been activated by Hlias.")
 
-# Heatmap Status
-st.markdown("### 🧠 Visual Heatmap")
-st.write("(Αυτό το τμήμα θα ενσωματώσει πραγματικό heatmap ανάλογα με την επιτυχία/αποτυχία)")
+    if st.button("🔵 Psychodynamic Filter"):
+        from genesis_modules.liberated_psychodynamic_filter import run as run_psycho
+        run_psycho()
+        st.success("✅ Psychodynamic Filter synchronized.")
+        send_telegram_message("🔵 *Psychodynamic Filter* has been activated by Hlias.")
 
-# CERN-style Health Bar
-st.markdown("### 🟩 System Health Status")
-st.success("Όλα τα modules είναι σταθερά προς το παρόν.")
-
-# Tabs λειτουργικότητας
-for i, tab in enumerate(tabs):
-    with tab:
-        st.header(f"⚙️ {MODULES[i]}")
-        if st.button(f"🚀 Run {MODULES[i]}"):
-            st.info(f"{MODULES[i]} ενεργοποιήθηκε... (προσθήκη watchdog σύντομα)")
-
-# Στατιστικά Watchdog
-st.markdown("### 📈 Watchdog Real-Time Stats")
-st.write("Logs, alerts και αλλαγές αρχείων θα εμφανίζονται εδώ σύντομα.")
+st.markdown("---")
+st.markdown("<small>🌱 Genesis Pulse v1.0 – Powered by ARVIA SYSTEMS</small>", unsafe_allow_html=True)
