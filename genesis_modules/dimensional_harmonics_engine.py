@@ -1,55 +1,37 @@
-# genesis_modules/dimensional_harmonics_engine.py
-
+import streamlit as st
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import MinMaxScaler
-from pathlib import Path
 
-class DimensionalHarmonicsEngine:
-    def __init__(self, data: pd.DataFrame):
-        self.original_data = data
-        self.scaled_data = None
-        self.pca = None
-        self.pca_result = None
-        self.n_components = 2
 
-    def scale_data(self):
-        scaler = MinMaxScaler()
-        self.scaled_data = scaler.fit_transform(self.original_data)
-        return self.scaled_data
+def generate_harmonic_field(size=100, frequency=5, phase_shift=0.0):
+    x = np.linspace(0, 2 * np.pi, size)
+    y = np.linspace(0, 2 * np.pi, size)
+    X, Y = np.meshgrid(x, y)
+    Z = np.sin(frequency * X + phase_shift) + np.cos(frequency * Y + phase_shift)
+    return X, Y, Z
 
-    def apply_pca(self, n_components=2):
-        self.n_components = n_components
-        self.pca = PCA(n_components=n_components)
-        self.pca_result = self.pca.fit_transform(self.scaled_data)
-        return self.pca_result
 
-    def visualize(self, save_path='outputs/dimensionality_reduction/pca_visual.png'):
-        if self.pca_result is None:
-            raise ValueError("Run apply_pca() before visualization.")
+def plot_harmonic_field(X, Y, Z, title="Dimensional Harmonics Visualization"):
+    fig, ax = plt.subplots(figsize=(6, 6))
+    contour = ax.contourf(X, Y, Z, cmap="viridis")
+    ax.set_title(title)
+    ax.set_xlabel("X-axis (Harmonics)")
+    ax.set_ylabel("Y-axis (Harmonics)")
+    plt.colorbar(contour, ax=ax, label="Amplitude")
+    return fig
 
-        plt.figure(figsize=(8, 6))
-        sns.scatterplot(
-            x=self.pca_result[:, 0],
-            y=self.pca_result[:, 1],
-            palette="viridis"
-        )
-        plt.title("PCA Visualization - Dimensional Harmonics")
-        plt.xlabel("Principal Component 1")
-        plt.ylabel("Principal Component 2")
-        plt.tight_layout()
 
-        save_path = Path(save_path)
-        save_path.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(save_path)
-        plt.close()
+def run():
+    st.subheader("🌀 Dimensional Harmonics Engine")
 
-    def explained_variance(self):
-        if self.pca is None:
-            raise ValueError("Run apply_pca() first.")
-        return self.pca.explained_variance_ratio_
+    st.markdown("This module visualizes synthetic dimensional harmonic fields based on adjustable parameters.")
 
-        }
+    with st.sidebar.expander("⚙️ Harmonic Settings", expanded=True):
+        size = st.slider("Resolution", 50, 500, 200, step=10)
+        frequency = st.slider("Frequency", 1, 20, 5)
+        phase_shift = st.slider("Phase Shift", 0.0, 2 * np.pi, 0.0, step=0.1)
+
+    X, Y, Z = generate_harmonic_field(size=size, frequency=frequency, phase_shift=phase_shift)
+    fig = plot_harmonic_field(X, Y, Z)
+
+    st.pyplot(fig)
