@@ -1,96 +1,53 @@
-"""
-genetic_pattern_modulator.py
-Module to encode settings into a unique DNA string.
-"""
+# genetic_pattern_modulator.py
 
-import hashlib
-import json
-
-
-def encode_settings_to_dna(settings: dict) -> str:
-    """
-    Encode a dictionary of settings into a unique DNA-like hash string.
-    """
-    settings_str = json.dumps(settings, sort_keys=True)
-    dna = hashlib.sha256(settings_str.encode()).hexdigest()
-    return dna
-
-
-def decode_dna_to_settings(dna: str, reference_db: dict) -> dict:
-    """
-    Given a DNA string and a reference database, retrieve the matching settings.
-    """
-    for settings in reference_db.values():
-        if encode_settiimport os
+import streamlit as st
+import numpy as np
 import random
-import string
-import json
-from datetime import datetime
+import os
 
-OUTPUT_DIR = "outputs/genetic_modulations"
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+def generate_genetic_pattern(seed=None):
+    if seed:
+        random.seed(seed)
+        np.random.seed(seed)
+    
+    pattern = np.random.choice(range(1, 81), size=20, replace=False)
+    return sorted(pattern)
 
-def encode_to_dna(settings: dict) -> str:
-    """
-    Μετατρέπει dictionary ρυθμίσεων σε DNA-like string
-    """
-    json_str = json.dumps(settings, sort_keys=True)
-    encoded = ''.join(random.choice("AGTC") for _ in range(len(json_str) * 2))
-    return encoded
+def mutate_pattern(pattern, mutation_rate=0.1):
+    mutated = pattern.copy()
+    for i in range(len(mutated)):
+        if random.random() < mutation_rate:
+            mutated[i] = random.randint(1, 80)
+    return sorted(list(set(mutated)))[:20]
 
-def decode_from_dna(dna_string: str) -> dict:
-    """
-    Ανακατασκευάζει ένα dictionary από fake DNA string (placeholder)
-    """
-    return {"decoded": True, "length": len(dna_string)}
-
-def save_to_file(data: dict, filename: str):
-    path = os.path.join(OUTPUT_DIR, filename)
-    with open(path, "w") as f:
-        json.dump(data, f, indent=4)
-
-def run():
-    """
-    Εκτελεί encoding και decoding, και αποθηκεύει αρχεία
-    """
-    settings = {
-        "module": "DNA Modulator",
-        "version": "1.0",
-        "timestamp": datetime.now().isoformat()
-    }
-
-    encoded_dna = encode_to_dna(settings)
-    decoded_data = decode_from_dna(encoded_dna)
-
-    result = {
-        "original_settings": settings,
-        "encoded_dna": encoded_dna,
-        "decoded_data": decoded_data
-    }
-
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    save_to_file(result, f"modulation_{timestamp}.json")
-ngs_to_dna(settings) == dna:
-            return settings
-    return {}
-
+def crossover_patterns(p1, p2):
+    half = len(p1) // 2
+    child = list(set(p1[:half] + p2[half:]))
+    while len(child) < 20:
+        child.append(random.randint(1, 80))
+        child = list(set(child))
+    return sorted(child[:20])
 
 def run():
-    # Example usage with test settings
-    test_settings = {
-        "mutation_rate": 0.02,
-        "crossover_rate": 0.8,
-        "selection_method": "tournament",
-        "population_size": 100
-    }
+    st.title("🧬 Genetic Pattern Modulator")
 
-    dna = encode_settings_to_dna(test_settings)
-    print(f"Encoded DNA: {dna}")
+    seed = st.number_input("Seed (optional)", min_value=0, value=42)
+    mutation_rate = st.slider("Mutation Rate", 0.0, 1.0, 0.1, step=0.05)
 
-    # Simulated reference DB
-    ref_db = {
-        "template_1": test_settings
-    }
+    if st.button("Generate Initial Pattern"):
+        pattern = generate_genetic_pattern(seed)
+        st.success(f"Initial Pattern: {pattern}")
 
-    decoded = decode_dna_to_settings(dna, ref_db)
-    print(f"Decoded settings: {decoded}")
+    if st.button("Mutate Pattern"):
+        pattern = generate_genetic_pattern(seed)
+        mutated = mutate_pattern(pattern, mutation_rate)
+        st.info(f"Original: {pattern}")
+        st.success(f"Mutated: {mutated}")
+
+    if st.button("Crossover Two Patterns"):
+        p1 = generate_genetic_pattern(seed)
+        p2 = generate_genetic_pattern(seed + 1)
+        child = crossover_patterns(p1, p2)
+        st.write(f"Parent 1: {p1}")
+        st.write(f"Parent 2: {p2}")
+        st.success(f"Child: {child}")
