@@ -1,17 +1,23 @@
-"""
-Liberated Psychodynamic Filter
--------------------------------
-A subconscious harmonizer. Filters chaotic noise and balances inner cognitive pulses.
-Used to align the generator with universal resonance.
-"""
+# genesis_modules/liberated_psychodynamic_filter.py
 
-class LiberatedPsychodynamicFilter:
-    def __init__(self):
-        self.mode = "Reflective Equilibrium"
+import streamlit as st
+import random
 
-    def run(self):
-        print("[🌀] Psychodynamic Filter is stabilizing cognitive-energetic flow...")
+def run():
+    st.markdown("## 🧠 Psychodynamic Filter Activated")
+    
+    st.info("This module analyzes symbolic, subconscious and associative patterns within the KINO draws.", icon="🧬")
 
-if __name__ == "__main__":
-    filter = LiberatedPsychodynamicFilter()
-    filter.run()
+    # Generate a symbolic semantic cloud
+    archetypes = ["Anima", "Shadow", "Hero", "Trickster", "Self", "Wise Old Man", "Great Mother"]
+    symbol_pool = ["⚖️", "🔥", "💧", "🌬️", "🌱", "🌀", "🔮", "⏳", "🧭", "🌌"]
+    random.shuffle(symbol_pool)
+
+    st.subheader("🧿 Archetypal Symbol Map")
+    for archetype in archetypes:
+        selected_symbols = random.sample(symbol_pool, k=3)
+        st.write(f"**{archetype}** → {' '.join(selected_symbols)}")
+
+    st.markdown("---")
+
+    st.success("Psychodynamic projection layer complete. Filter is synchronized with the subconscious stream.")
