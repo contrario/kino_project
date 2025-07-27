@@ -1,6 +1,4 @@
-streamlit>=1.15.0
-pandas
-numpy
-schedule
-python-telegram-bot
-matplotlib
+streamlit
+watchdog
+requests
+python-dotenv
