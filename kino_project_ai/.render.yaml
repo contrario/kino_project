@@ -1,11 +1,19 @@
+# kino_project_ai/.render.yaml
+
 services:
   - type: web
-    name: kino-project-ai
+    name: kino_project_ai
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run kino_overseer_web.py --server.port $PORT --server.address 0.0.0.0
-    envVars:
-      - key: TELEGRAM_CHAT_ID
-        fromEnvVar: TELEGRAM_CHAT_ID
-      - key: TELEGRAM_BOT_TOKEN
-        fromEnvVar: TELEGRAM_BOT_TOKEN
+    startCommand: streamlit run kino_overseer_web.py
+    autoDeploy: true
+
+envVars:
+  - key: OPENAI_API_KEY
+    sync: true
+  - key: TELEGRAM_BOT_TOKEN
+    sync: true
+  - key: TELEGRAM_CHAT_ID
+    sync: true
+  - key: STREAMLIT_SERVER_PORT
+    value: "7860"

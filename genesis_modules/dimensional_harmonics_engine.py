@@ -1,31 +1,45 @@
 # genesis_modules/dimensional_harmonics_engine.py
 
-import streamlit as st
-import numpy as np
-import matplotlib.pyplot as plt
+from utils.math_tools import calculate_dimensional_resonance
+from core.engines.harmonics_base import HarmonicsBase
+from modules.visualizers import render_harmonic_map
 
-def generate_harmonic_pattern(size=200, freq=3.14):
-    x = np.linspace(0, 4 * np.pi, size)
-    y = np.sin(freq * x) + 0.5 * np.sin(2 * freq * x) + 0.25 * np.sin(4 * freq * x)
-    return x, y
+class DimensionalHarmonicsEngine(HarmonicsBase):
+    """
+    Engine that calculates harmonic resonance across dimensional layers
+    and renders the output as a harmonic map.
+    """
 
-def display_fractal_harmonic():
-    st.subheader("🎼 Fractal Harmonic Pattern")
+    def __init__(self, input_dimensions, seed_values):
+        super().__init__()
+        self.input_dimensions = input_dimensions
+        self.seed_values = seed_values
+        self.harmonic_profile = None
 
-    x, y = generate_harmonic_pattern()
-    fig, ax = plt.subplots()
-    ax.plot(x, y, color='cyan')
-    ax.set_facecolor('black')
-    ax.set_title("Fractal Harmonics", color='white')
-    ax.tick_params(colors='white')
-    fig.patch.set_facecolor('black')
-    st.pyplot(fig)
+    def compute_harmonics(self):
+        """
+        Computes the harmonic resonance profile based on dimensions and seed values.
+        """
+        self.harmonic_profile = calculate_dimensional_resonance(
+            self.input_dimensions,
+            self.seed_values
+        )
+        return self.harmonic_profile
 
-def run():
-    st.subheader("🧠 Dimensional Harmonics Engine")
-    st.markdown("This module explores harmonic frequencies, fractal forms and dimensional interference.")
+    def render(self, output_path=None):
+        """
+        Renders the harmonic profile as a map or graphic.
+        """
+        if self.harmonic_profile is None:
+            self.compute_harmonics()
+        render_harmonic_map(self.harmonic_profile, output_path)
 
-    if st.button("🎶 Generate Harmonic Pattern"):
-        display_fractal_harmonic()
-
-    st.info("More submodules will appear soon: temporal sync, resonance models, and morphogenetic fields.")
+    def export_profile(self):
+        """
+        Exports the harmonic profile as a dictionary.
+        """
+        return {
+            "dimensions": self.input_dimensions,
+            "seeds": self.seed_values,
+            "profile": self.harmonic_profile
+        }
