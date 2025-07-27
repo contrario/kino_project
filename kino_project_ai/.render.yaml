@@ -2,18 +2,12 @@
 
 services:
   - type: web
-    name: kino_project_ai
+    name: kino-project-ai
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: streamlit run kino_overseer_web.py
     autoDeploy: true
-
-envVars:
-  - key: OPENAI_API_KEY
-    sync: true
-  - key: TELEGRAM_BOT_TOKEN
-    sync: true
-  - key: TELEGRAM_CHAT_ID
-    sync: true
-  - key: STREAMLIT_SERVER_PORT
-    value: "7860"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
