@@ -1,8 +1,12 @@
 services:
   - type: web
-    name: kino_project
+    name: kino-project-ai
     env: python
-    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run kino_overseer_web.py --server.port=$PORT
-    autoDeploy: true
+    startCommand: streamlit run kino_overseer_web.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: TELEGRAM_CHAT_ID
+        fromEnvVar: TELEGRAM_CHAT_ID
+      - key: TELEGRAM_BOT_TOKEN
+        fromEnvVar: TELEGRAM_BOT_TOKEN
+
