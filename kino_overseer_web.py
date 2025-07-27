@@ -1,22 +1,11 @@
 
 import streamlit as st
-from modules import watchdog_panel
+from watchdog import run_watchdog_monitor
 
-# Title & Styling
 st.set_page_config(page_title="KINO Overseer Web", layout="wide")
-st.title("🎛️ KINO Overseer Web Control Panel")
 
-# Sidebar Navigation
-st.sidebar.title("📂 Modules")
-selected_module = st.sidebar.radio("Επιλέξτε λειτουργία:", ["🔍 Watchdog Panel", "📊 Coming Soon"])
+st.title("🎛️ KINO Project Control Panel")
 
-# Dynamic Content
-if selected_module == "🔍 Watchdog Panel":
-    watchdog_panel.render()
-
-elif selected_module == "📊 Coming Soon":
-    st.info("Περισσότερα modules θα προστεθούν σύντομα.")
-
-# Footer
-st.markdown("---")
-st.markdown("🎯 **ARVIA SYSTEMS — Unified AI Ecosystem** | Powered by Da Vinci Protocol 🚀")
+if st.button("Run Watchdog Monitor"):
+    st.success("Watchdog Monitor ενεργοποιήθηκε.")
+    run_watchdog_monitor()
