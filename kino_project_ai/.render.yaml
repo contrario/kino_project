@@ -9,4 +9,3 @@ services:
         fromEnvVar: TELEGRAM_CHAT_ID
       - key: TELEGRAM_BOT_TOKEN
         fromEnvVar: TELEGRAM_BOT_TOKEN
-
