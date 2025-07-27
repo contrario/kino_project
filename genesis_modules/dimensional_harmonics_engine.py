@@ -1,17 +1,31 @@
-"""
-Dimensional Harmonics Engine
-----------------------------
-This module resonates harmonic frequencies across temporal KINO layers.
-Acts as a dimensional pulse generator syncing with the GENESIS PULSE.
-"""
+# genesis_modules/dimensional_harmonics_engine.py
 
-class DimensionalHarmonicsEngine:
-    def __init__(self):
-        self.status = "Initialized"
+import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
 
-    def run(self):
-        print("[🔮] Dimensional Harmonics Engine is generating multidimensional harmonic patterns...")
+def generate_harmonic_pattern(size=200, freq=3.14):
+    x = np.linspace(0, 4 * np.pi, size)
+    y = np.sin(freq * x) + 0.5 * np.sin(2 * freq * x) + 0.25 * np.sin(4 * freq * x)
+    return x, y
 
-if __name__ == "__main__":
-    engine = DimensionalHarmonicsEngine()
-    engine.run()
+def display_fractal_harmonic():
+    st.subheader("🎼 Fractal Harmonic Pattern")
+
+    x, y = generate_harmonic_pattern()
+    fig, ax = plt.subplots()
+    ax.plot(x, y, color='cyan')
+    ax.set_facecolor('black')
+    ax.set_title("Fractal Harmonics", color='white')
+    ax.tick_params(colors='white')
+    fig.patch.set_facecolor('black')
+    st.pyplot(fig)
+
+def run():
+    st.subheader("🧠 Dimensional Harmonics Engine")
+    st.markdown("This module explores harmonic frequencies, fractal forms and dimensional interference.")
+
+    if st.button("🎶 Generate Harmonic Pattern"):
+        display_fractal_harmonic()
+
+    st.info("More submodules will appear soon: temporal sync, resonance models, and morphogenetic fields.")
