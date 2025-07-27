@@ -1,43 +1,22 @@
-# kino_overseer_web.py
 
 import streamlit as st
+from modules import watchdog_panel
 
-# Εισαγωγές modules
-from genesis_modules.dimensional_harmonics_engine import run as run_dhe
-from genesis_modules.genetic_pattern_modulator import run as run_gpm
-from genesis_modules.liberated_psychodynamic_filter import run as run_psycho
+# Title & Styling
+st.set_page_config(page_title="KINO Overseer Web", layout="wide")
+st.title("🎛️ KINO Overseer Web Control Panel")
 
-# Τίτλος και Στυλ
-st.set_page_config(page_title="KINO Overseer", layout="wide")
+# Sidebar Navigation
+st.sidebar.title("📂 Modules")
+selected_module = st.sidebar.radio("Επιλέξτε λειτουργία:", ["🔍 Watchdog Panel", "📊 Coming Soon"])
 
-st.markdown("""
-    <style>
-        .main {background-color: #111;}
-        .stButton>button {
-            background-color: #880e4f;
-            color: white;
-            border-radius: 12px;
-            font-weight: bold;
-        }
-        .stButton>button:hover {
-            background-color: #c51162;
-        }
-    </style>
-""", unsafe_allow_html=True)
+# Dynamic Content
+if selected_module == "🔍 Watchdog Panel":
+    watchdog_panel.render()
 
-st.title("🧬 Genesis Control Layer")
+elif selected_module == "📊 Coming Soon":
+    st.info("Περισσότερα modules θα προστεθούν σύντομα.")
 
-# Επιλογή Εργαλείου
-selected_tool = st.sidebar.radio("🔮 Select a Module:", [
-    "🌌 Dimensional Harmonics Engine",
-    "🧬 Genetic Pattern Modulator",
-    "🧿 Psychodynamic Filter"
-])
-
-# Εκτέλεση του επιλεγμένου module
-if selected_tool == "🌌 Dimensional Harmonics Engine":
-    run_dhe()
-elif selected_tool == "🧬 Genetic Pattern Modulator":
-    run_gpm()
-elif selected_tool == "🧿 Psychodynamic Filter":
-    run_psycho()
+# Footer
+st.markdown("---")
+st.markdown("🎯 **ARVIA SYSTEMS — Unified AI Ecosystem** | Powered by Da Vinci Protocol 🚀")
