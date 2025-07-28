@@ -1,0 +1,7 @@
+
+services:
+  - type: web
+    name: kino-project-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run kino_overseer_web.py
