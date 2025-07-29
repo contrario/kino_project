@@ -1,15 +1,20 @@
-# KINO Project AI (Clean Render Version)
+# ✅ KINO Project AI – Clean Render Version
 
-Αυτό είναι ένα καθαρό και πλήρως λειτουργικό Streamlit app για άμεση εγκατάσταση στο Render.
+Αυτό είναι το Streamlit-based dashboard για το έργο KINO Project AI. Το σύστημα είναι modular, επεκτάσιμο και φιλοξενείται μέσω Render.
 
-## Περιεχόμενα
+---
 
-- `main.py`: Εκκίνηση του Streamlit app
-- `requirements.txt`: Απαιτούμενα πακέτα
+## 🔗 Online Dashboard
 
-## Οδηγίες
+👉 **Live URL**: [kino-project-ai.onrender.com](https://kino-project-ai.onrender.com)
 
-1. Ανέβασε τα αρχεία σε GitHub repo (π.χ. `kino_project_ai`)
-2. Στο Render:
-   - Επιλέγεις Python Web Service
-   - Start Command: `streamlit run main.py --server.port 10000 --server.enableCORS false`
+Αν βλέπεις την αρχική σελίδα με ✅ μήνυμα, τότε το σύστημα λειτουργεί κανονικά στο Render.
+
+---
+
+## 🚀 Εκκίνηση στο Render
+
+Για να τρέχει το `dashboard_main.py` ως κύρια εφαρμογή Streamlit:
+
+```bash
+streamlit run dashboard_main.py --server.port 10000 --server.enableCORS false
