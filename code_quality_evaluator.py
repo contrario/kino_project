@@ -1,61 +1,51 @@
 import os
 import json
-import subprocess
+import ast
+from pathlib import Path
 from datetime import datetime
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-LOGS_FOLDER = os.path.join(PROJECT_ROOT, "logs")
-OUTPUT_FILE = os.path.join(LOGS_FOLDER, "code_quality_report.json")
+PROJECT_ROOT = Path(__file__).resolve().parent
+LOG_DIR = PROJECT_ROOT / "logs"
+LOG_DIR.mkdir(exist_ok=True)
 
-def ensure_logs_folder():
-    os.makedirs(LOGS_FOLDER, exist_ok=True)
-
-def run_linting(path):
-    """Εκτελεί linting στον φάκελο και επιστρέφει τα αποτελέσματα."""
-    try:
-        result = subprocess.run(
-            ["flake8", path, "--format=json"],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        output = result.stdout.strip()
-        return json.loads(output) if output else {}
-    except Exception as e:
-        return {"error": str(e)}
-
-def run_black_check(path):
-    """Ελέγχει format με black --check"""
-    try:
-        result = subprocess.run(
-            ["black", "--check", "--diff", path],
-            capture_output=True,
-            text=True,
-            check=False
-        )
-        return {
-            "passed": result.returncode == 0,
-            "output": result.stdout.strip() + result.stderr.strip()
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-def evaluate_code_quality():
-    ensure_logs_folder()
-    code_path = PROJECT_ROOT
-    flake8_results = run_linting(code_path)
-    black_results = run_black_check(code_path)
-
-    report = {
-        "timestamp": datetime.now().isoformat(),
-        "flake8": flake8_results,
-        "black": black_results
+def evaluate_code_quality(file_path):
+    quality = {
+        "filename": str(file_path),
+        "line_count": 0,
+        "function_count": 0,
+        "class_count": 0,
+        "has_docstrings": False,
+        "has_type_annotations": False,
+        "syntax_ok": True,
     }
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(report, f, indent=4, ensure_ascii=False)
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            source = f.read()
+            quality["line_count"] = len(source.splitlines())
 
-    print(f"[✅] Code quality report saved to: {OUTPUT_FILE}")
+            tree = ast.parse(source)
+            quality["function_count"] = len([node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)])
+            quality["class_count"] = len([node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)])
+            quality["has_docstrings"] = any(isinstance(node, (ast.FunctionDef, ast.ClassDef)) and ast.get_docstring(node) for node in ast.walk(tree))
+            quality["has_type_annotations"] = any(hasattr(node, 'returns') and node.returns is not None for node in ast.walk(tree) if isinstance(node, ast.FunctionDef))
+    except Exception as e:
+        quality["syntax_ok"] = False
+        quality["error"] = str(e)
+
+    return quality
+
+def scan_project(directory):
+    results = []
+    for path in Path(directory).rglob("*.py"):
+        if path.name == "code_quality_evaluator.py":
+            continue
+        results.append(evaluate_code_quality(path))
+    return results
 
 if __name__ == "__main__":
-    evaluate_code_quality()
+    results = scan_project(PROJECT_ROOT)
+    output_path = LOG_DIR / "code_quality_report.json"
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=4)
+    print(f"✅ Quality report saved to {output_path}")
